@@ -2,66 +2,66 @@ version: "3"
 
 services:
 
-  crawler-cli1:
+  crawler-dc1:
     image: quay.io/prometheus/prometheus:v2.20.0
     volumes:
-      - "./prom-cli1-config.yml:/etc/prometheus/prometheus.yml"
-      - "./data/prom-cli1-dc1:/prometheus"
+      - "./prom-dc1-config.yml:/etc/prometheus/prometheus.yml"
+      - "./data/prom-dc1:/prometheus"
     user: root
     ports:
-      - "${PROM_CLI1_0_PORT}:${PROM_CLI1_0_PORT}"
+      - "${PROM_DC1_PORT}:${PROM_DC1_PORT}"
     command: ["--config.file=/etc/prometheus/prometheus.yml", 
     "--storage.tsdb.path=/prometheus",
     "--storage.tsdb.retention.time=1000d", 
     "--storage.tsdb.max-block-duration=2h", 
     "--storage.tsdb.min-block-duration=2h", 
-    "--web.listen-address=:$PROM_CLI1_0_PORT", 
-    "--web.external-url=${PROM_CLI1_0_EXT_ADDRESS}:$PROM_CLI1_0_PORT", 
+    "--web.listen-address=:$PROM_DC1_PORT", 
+    "--web.external-url=${PROM_DC1_EXT_ADDRESS}:$PROM_DC1_PORT", 
     "--web.enable-lifecycle", 
     "--web.enable-admin-api"]
 
-  crawler-cli2:
+  crawler-dc2:
     image: quay.io/prometheus/prometheus:v2.20.0
     volumes:
-      - "./prom-cli2-config.yml:/etc/prometheus/prometheus.yml"
-      - "./data/prom-cli2-dc1:/prometheus"
+      - "./prom-dc2-config.yml:/etc/prometheus/prometheus.yml"
+      - "./data/prom-dc2:/prometheus"
     user: root
     ports:
-      - "${PROM_CLI2_0_PORT}:${PROM_CLI2_0_PORT}"
+      - "${PROM_DC2_PORT}:${PROM_DC2_PORT}"
     command: ["--config.file=/etc/prometheus/prometheus.yml", 
     "--storage.tsdb.path=/prometheus",
     "--storage.tsdb.retention.time=1000d", 
     "--storage.tsdb.max-block-duration=2h", 
     "--storage.tsdb.min-block-duration=2h", 
-    "--web.listen-address=:$PROM_CLI2_0_PORT", 
-    "--web.external-url=${PROM_CLI2_0_EXT_ADDRESS}:$PROM_CLI2_0_PORT", 
+    "--web.listen-address=:$PROM_DC2_PORT", 
+    "--web.external-url=${PROM_DC2_EXT_ADDRESS}:$PROM_DC2_PORT", 
     "--web.enable-lifecycle", 
     "--web.enable-admin-api"]
 
-  sidecar-cli1:
+  sidecar-dc1:
     image: quay.io/thanos/thanos:v0.16.0
     volumes:
-      - "./prom-cli1-config.yml:/etc/prometheus/prometheus.yml"
+      - "./prom-dc1-config.yml:/etc/prometheus/prometheus.yml"
     user: root
     command: "sidecar --http-address 0.0.0.0:19091 \
     --grpc-address 0.0.0.0:19191 \
     --reloader.config-file /etc/prometheus/prometheus.yml \
-    --prometheus.url http://crawler-cli1:${PROM_CLI1_0_PORT}"
+    --prometheus.url http://crawler-dc1:${PROM_DC1_PORT}"
 
-  sidecar-cli2:
+  sidecar-dc2:
     image: quay.io/thanos/thanos:v0.16.0
     volumes:
-      - "./prom-cli2-config.yml:/etc/prometheus/prometheus.yml"
+      - "./prom-dc2-config.yml:/etc/prometheus/prometheus.yml"
     user: root
     command: "sidecar --http-address 0.0.0.0:19092 \
     --grpc-address 0.0.0.0:19192 \
     --reloader.config-file /etc/prometheus/prometheus.yml \
-    --prometheus.url http://crawler-cli2:${PROM_CLI2_0_PORT}"
+    --prometheus.url http://crawler-dc2:${PROM_DC2_PORT}"
 
   global-query:
     image: quay.io/thanos/thanos:v0.16.0
     volumes:
-      - "./prom-cli2-config.yml:/etc/prometheus/prometheus.yml"
+      - "./prom-dc2-config.yml:/etc/prometheus/prometheus.yml"
     user: root
     ports:
       - "9090:9090"
@@ -70,8 +70,8 @@ services:
     --grpc-address 0.0.0.0:19190 \
     --query.replica-label replica \
     --log.level=debug
-    --store sidecar-cli1:19191 \
-    --store sidecar-cli2:19192"
+    --store sidecar-dc1:19191 \
+    --store sidecar-dc2:19192"
 
 #  prom-proxy:
 #    image: quay.io/thanos/prom-label-proxy:v0.3.0-rc.0-ext1

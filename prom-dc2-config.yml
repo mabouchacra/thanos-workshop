@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 5s
+  external_labels:
+    cluster: dc2
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['127.0.0.1:9092']
+  - job_name: 'sidecar'
+    static_configs:
+      - targets: ['sidecar-dc2:19092']
