@@ -3,7 +3,7 @@ version: "3"
 services:
 
   crawler-dc1:
-    image: quay.io/prometheus/prometheus:v2.20.0
+    image: quay.io/prometheus/prometheus:v2.26.0
     volumes:
       - "./prom-dc1-config.yml:/etc/prometheus/prometheus.yml"
       - "./data/prom-dc1:/prometheus"
@@ -21,7 +21,7 @@ services:
     "--web.enable-admin-api"]
 
   crawler-dc2:
-    image: quay.io/prometheus/prometheus:v2.20.0
+    image: quay.io/prometheus/prometheus:v2.26.0
     volumes:
       - "./prom-dc2-config.yml:/etc/prometheus/prometheus.yml"
       - "./data/prom-dc2:/prometheus"
@@ -73,17 +73,7 @@ services:
     --store sidecar-dc1:19191 \
     --store sidecar-dc2:19192"
 
-#  prom-proxy:
-#    image: quay.io/thanos/prom-label-proxy:v0.3.0-rc.0-ext1
-#    ports:
-#      - "39090:39090"
-#    command: "-label client \
-#    -upstream http://global-query:9090 \
-#    -insecure-listen-address 0.0.0.0:39090 \
-#    -non-api-path-passthrough \
-#    -enable-label-apis"
-
   grafana:
     image: grafana/grafana:7.2.1
     ports:
-      - "3000:3000"
+      - "3100:3000"

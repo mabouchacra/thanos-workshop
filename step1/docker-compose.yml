@@ -1,0 +1,55 @@
+version: "3"
+
+services:
+
+  crawler-dc1:
+    image: quay.io/prometheus/prometheus:v2.26.0
+    volumes:
+      - "./prom-dc1-config.yml:/etc/prometheus/prometheus.yml"
+      - "./data/prom-dc1:/prometheus"
+      # - "/etc/timezone:/etc/timezone:ro"
+      # - "/etc/localtime:/etc/localtime:ro"
+    user: root
+    # environment:
+    #   TZ: Europe/Paris
+    ports:
+      - "${PROM_DC1_PORT}:${PROM_DC1_PORT}"
+    command: ["--config.file=/etc/prometheus/prometheus.yml", 
+    "--storage.tsdb.path=/prometheus",
+    "--storage.tsdb.retention.time=1000d", 
+    # "--storage.tsdb.max-block-duration=4h", 
+    # "--storage.tsdb.min-block-duration=4h", 
+    "--web.listen-address=:$PROM_DC1_PORT", 
+    "--web.external-url=${PROM_DC1_EXT_ADDRESS}:$PROM_DC1_PORT", 
+    "--web.enable-lifecycle",
+    "--no-scrape.adjust-timestamps", 
+    "--web.enable-admin-api"]
+
+  crawler-dc2:
+    image: quay.io/prometheus/prometheus:v2.26.0
+    volumes:
+      - "./prom-dc2-config.yml:/etc/prometheus/prometheus.yml"
+      - "./data/prom-dc2:/prometheus"
+      # - "/etc/timezone:/etc/timezone:ro"
+      # - "/etc/localtime:/etc/localtime:ro"
+    user: root
+    # environment:
+    #   TZ: Europe/Paris
+    ports:
+      - "${PROM_DC2_PORT}:${PROM_DC2_PORT}"
+    command: ["--config.file=/etc/prometheus/prometheus.yml", 
+    "--storage.tsdb.path=/prometheus",
+    "--storage.tsdb.retention.time=1000d", 
+    # "--storage.tsdb.max-block-duration=4h", 
+    # "--storage.tsdb.min-block-duration=4h", 
+    "--web.listen-address=:$PROM_DC2_PORT", 
+    "--web.external-url=${PROM_DC2_EXT_ADDRESS}:$PROM_DC2_PORT", 
+    "--web.enable-lifecycle", 
+    "--no-scrape.adjust-timestamps", 
+    "--web.enable-admin-api"]
+
+
+  grafana:
+    image: grafana/grafana:7.2.1
+    ports:
+      - "3000:3000"
